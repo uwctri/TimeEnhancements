@@ -1,0 +1,30 @@
+{
+    "name": "Time Enhancements",
+    "description": "Various enhancements related to time entry including support for 12 hour time entry, modern date/time pickers, and time-related action tags.",
+    "namespace": "UWMadison\\TimeEnhancements",
+    "authors": [
+        {
+            "name": "Adam Nunez",
+            "email": "Adam.Nunez@ctri.wisc.edu",
+            "institution": "UW Madison - Center for Tobacco Research and Intervention"
+        }
+    ],
+    "framework-version": 16,
+    "action-tags": [
+        {
+            "tag": "@TOMORROWBUTTON",
+            "description": "Adds a \"Tomorrow\" button below the date field that populates the feild with the next day."
+        },
+        {
+            "tag": "@NEXTWORKDAYBUTTON",
+            "description": "Adds a \"Next Work Day\" button below the date field that populates the feild with the next week day."
+        }
+    ],
+    "project-settings": [
+        {
+            "key": "info",
+            "name": "No configuration is needed to enter 12 hour time. All below configuration options pertain to the modern date/time picker.",
+            "type": "descriptive"
+        }
+    ]
+}
