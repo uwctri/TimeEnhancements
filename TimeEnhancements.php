@@ -32,20 +32,35 @@ class TimeEnhancements extends AbstractExternalModule
     private function actionTags($instrument)
     {
         // Action tags that are JS based
+        $validation = "text_validation_type_or_show_slider_number";
         $tomorrow = [];
         $workday = [];
+        $addDays = [];
         $dd = REDCap::getDataDictionary("array", false, null, $instrument);
         foreach ($dd as $field => $info) {
-            //@TOMORROWBUTTON
-            if ((strpos($info['field_type'], 'date_') !== false) && (strpos($info["field_annotation"], "@TOMORROWBUTTON") !== false)) {
-            }
-            //@NEXTWORKDAYBUTTON
-            if ((strpos($info['field_type'], 'date_') !== false) && (strpos($info["field_annotation"], "@NEXTWORKDAYBUTTON") !== false)) {
+            if (str_contains($info[$validation], 'date_') && $info["field_type"] == "text") {
+                //@TOMORROWBUTTON
+                if (str_contains($info["field_annotation"], "@TOMORROWBUTTON"))
+                    $tomorrow[] = $field;
+                //@NEXTWORKDAYBUTTON
+                if (str_contains($info["field_annotation"], "@NEXTWORKDAYBUTTON"))
+                    $workday[] = $field;
+                //@ADDDAYSBUTTON (support multiple)
+                foreach (explode("@", $info["field_annotation"]) as $annotation) {
+                    if (str_starts_with($annotation, "ADDDAYSBUTTON=")) {
+                        $tmp = explode(",", trim(str_replace("ADDDAYSBUTTON=", "", $annotation), ' "'));
+                        $addDays[$field][] = [
+                            "days" => intval($tmp[0]),
+                            "text" => $tmp[1],
+                        ];
+                    }
+                }
             }
         }
         $this->passArgument([
             "@TOMORROWBUTTON" => $tomorrow,
-            "@NEXTWORKDAYBUTTON" => $workday
+            "@NEXTWORKDAYBUTTON" => $workday,
+            "@ADDDAYSBUTTON" => $addDays,
         ]);
     }
 

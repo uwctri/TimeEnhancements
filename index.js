@@ -4,7 +4,6 @@
 
     // TODO setup new picker (try to get datetime-local to work)
     // TODO config for the picker (field config based - max year, seconds, enable time,  )
-    // TODO Action tags not tested at all
 
     const time_picker = () => {
 
@@ -70,8 +69,8 @@
 
     const actiontag_btn = () => {
         const formatRedcapDate = (date, format) => {
-            let month = (date.getMonth() + 1).padStart(2, '0')
-            let day = (date.getDate()).padStart(2, '0')
+            let month = String(date.getMonth() + 1).padStart(2, '0')
+            let day = String(date.getDate()).padStart(2, '0')
             let year = date.getFullYear()
             format = format.split("_").slice(-1)
             return {
@@ -80,27 +79,32 @@
             }[format] ?? `${year}-${month}-${day}`
         }
 
-        const nextDay = (weekday = false) => {
-            let t = new Date(new Date().setDate(new Date().getDate() + 1))
+        const addDays = (days = 1, weekday = false) => {
+            let t = new Date(new Date().setDate(new Date().getDate() + days))
             if (weekday && (t.getDay() == "6"))
                 t.setDate(t.getDate() + 2)
+            if (weekday && (t.getDay() == "0"))
+                t.setDate(t.getDate() + 1)
             return t
         }
 
-        const addbtn = (name) => {
-            let $inputBox = $(`input[name = ${name}]`)
-            $inputBox.parent().find('span').before(buttonTemplate)
-            $inputBox.parent().find('.tomorrowButton').on('click', function (event) {
-                event.preventDefault()
-                $inputBox.val(formatRedcapDate(nextDay(), $inputBox.attr('fv')))
-            })
+        const addbtn = (name, text, days, weekday = false) => {
+            const template = `<button class="jqbuttonsm ui-button ui-corner-all ui-widget timeEnhancementsBtn" data-te-weekday=${weekday} data-te-days=${days} style="margin:5px 0 5px 5px">${text}</button>`
+            $(`input[name=${name}]`).parent().after(template)
         }
 
-        const buttonTemplate = `
-            <button class= "jqbuttonsm ui-button ui-corner-all ui-widget tomorrowButton" style="margin:5px 0 5px 5px" > Tomorrow</button>`
-
-        $.each(module["@TOMORROWBUTTON"], (_, name) => addbtn(name))
-        $.each(module["@NEXTWORKDAYBUTTON"], (_, name) => addbtn(name))
+        $.each(module["@TOMORROWBUTTON"], (_, name) => addbtn(name, "Tomorrow", 1))
+        $.each(module["@NEXTWORKDAYBUTTON"], (_, name) => addbtn(name, "Next Workday", 1, true))
+        $.each(module["@ADDDAYSBUTTON"], (name, btns) => {
+            $.each(btns, (_, info) => addbtn(name, info.text, info.days))
+        })
+        $("body").on("click", ".timeEnhancementsBtn", function (event) {
+            event.preventDefault()
+            const $inputBox = $(this).parent().find('input')
+            const days = parseInt($(this).attr('data-te-days'))
+            const weekday = $(this).attr('data-te-weekday') ? true : false
+            $inputBox.val(formatRedcapDate(addDays(days, weekday), $inputBox.attr('fv')))
+        })
     }
 
     $(document).ready(() => {

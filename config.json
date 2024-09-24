@@ -18,6 +18,10 @@
         {
             "tag": "@NEXTWORKDAYBUTTON",
             "description": "Adds a \"Next Work Day\" button below the date field that populates the feild with the next week day."
+        },
+        {
+            "tag": "@ADDDAYSBUTTON",
+            "description": "Adds a button below the date field with configurable text that adds, or subtracts, some number of days from today. E.g. @ADDDAYSBUTTON=\"3,Three Days\" will create a button with that sets the date field to the date three days from today."
         }
     ],
     "project-settings": [
