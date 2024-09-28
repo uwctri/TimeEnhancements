@@ -10,22 +10,31 @@ class TimeEnhancements extends AbstractExternalModule
     public function redcap_every_page_top($project_id)
     {
         $this->initializeJavascriptModuleObject();
+        $page = $_GET['page'];
 
         // Designer Page
-        if ($this->isPage('Design/online_designer.php') && $project_id && $_GET['page']) {
-            $this->includeJs("index.js");
-        }
+        if ($this->isPage('Design/online_designer.php') && $project_id && $page)
+            $this->loadEverything($page);
     }
 
     public function redcap_data_entry_form($project_id, $record, $instrument)
     {
-        $this->actionTags($instrument);
-        $this->includeJs("index.js");
+        $this->loadEverything($instrument);
     }
 
     public function redcap_survey_page($project_id, $record, $instrument)
     {
+        $this->loadEverything($instrument);
+    }
+
+    private function loadEverything($instrument)
+    {
         $this->actionTags($instrument);
+        $this->passArgument([
+            "modern" => $this->getProjectSetting("modern") == "1",
+        ]);
+        $this->includeJs("tempus-dominus.min.js");
+        $this->loadCss("tempus-dominus.min.css");
         $this->includeJs("index.js");
     }
 
@@ -67,6 +76,11 @@ class TimeEnhancements extends AbstractExternalModule
     private function includeJs($path)
     {
         echo '<script src="' . $this->getUrl($path) . '"></script>' . "\n";
+    }
+
+    private function loadCss($path)
+    {
+        echo '<link rel="stylesheet" href="' . $this->getUrl($path) . '">' . "\n";
     }
 
     private function passArgument($arr)

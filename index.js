@@ -1,13 +1,15 @@
 (() => {
 
     const module = ExternalModules.UWMadison.TimeEnhancements
+    const TD = tempusDominus
 
-    // TODO setup new picker (try to get datetime-local to work)
-    // TODO config for the picker (field config based - max year, seconds, enable time,  )
+    // TODO config for the picker (field config based - seconds, enable time, etc)
+    // TODO Show cal on click of icons
 
-    const time_picker = () => {
+    const time_12_hour = () => {
 
         const handle_time = (time, incSec) => {
+            console.log(time)
             time = time.toLowerCase()
             let isPM = time.includes('p')
             let isAM = time.includes('a')
@@ -41,8 +43,7 @@
             return timeStr.slice(0, 5)
         }
 
-        // Match hh:mm:ss and hh:mm
-        $('input[fv^=time_hh_mm]').off().on('change', (event) => {
+        const time_field_event = (event) => {
             let $el = $(event.target)
             let fv = $el.attr('fv')
             if (!$el.val())
@@ -51,24 +52,31 @@
             if (!timeStr)
                 return
             $el.val(timeStr)
-        })
+        }
 
-        // Match datetime fields
-        $('input[fv^=datetime]').off().on('change', (event) => {
+        const datetime_field_event = (event) => {
             let $el = $(event.target)
             let fv = $el.attr('fv')
             if (!$el.val())
                 return
             let [date, time] = $el.val().split(' ')
+            if (!time)
+                return
             let timeStr = handle_time(time, fv.startsWith("datetime_seconds"))
             if (!timeStr)
                 return
             $el.val(`${date} ${timeStr}`)
-        })
+        }
+
+        // Match hh:mm:ss and hh:mm
+        $('input[fv^=time_hh_mm]').off().on('change', time_field_event)
+
+        // Match any datetime field
+        $('input[fv^=datetime]').off().on('change', datetime_field_event)
     }
 
     const actiontag_btn = () => {
-        const formatRedcapDate = (date, format) => {
+        const format_rc_date = (date, format) => {
             let month = String(date.getMonth() + 1).padStart(2, '0')
             let day = String(date.getDate()).padStart(2, '0')
             let year = date.getFullYear()
@@ -79,7 +87,7 @@
             }[format] ?? `${year}-${month}-${day}`
         }
 
-        const addDays = (days = 1, weekday = false) => {
+        const add_days = (days = 1, weekday = false) => {
             let t = new Date(new Date().setDate(new Date().getDate() + days))
             if (weekday && (t.getDay() == "6"))
                 t.setDate(t.getDate() + 2)
@@ -88,27 +96,61 @@
             return t
         }
 
-        const addbtn = (name, text, days, weekday = false) => {
+        const add_btn = (name, text, days, weekday = false) => {
             const template = `<button class="jqbuttonsm ui-button ui-corner-all ui-widget timeEnhancementsBtn" data-te-weekday=${weekday} data-te-days=${days} style="margin:5px 0 5px 5px">${text}</button>`
             $(`input[name=${name}]`).parent().after(template)
         }
 
-        $.each(module["@TOMORROWBUTTON"], (_, name) => addbtn(name, "Tomorrow", 1))
-        $.each(module["@NEXTWORKDAYBUTTON"], (_, name) => addbtn(name, "Next Workday", 1, true))
-        $.each(module["@ADDDAYSBUTTON"], (name, btns) => {
-            $.each(btns, (_, info) => addbtn(name, info.text, info.days))
-        })
-        $("body").on("click", ".timeEnhancementsBtn", function (event) {
+        const btn_event = (event) => {
             event.preventDefault()
-            const $inputBox = $(this).parent().find('input')
-            const days = parseInt($(this).attr('data-te-days'))
-            const weekday = $(this).attr('data-te-weekday') ? true : false
-            $inputBox.val(formatRedcapDate(addDays(days, weekday), $inputBox.attr('fv')))
+            const $el = $(event.target)
+            const $inputBox = $el.parent().find('input')
+            const days = parseInt($el.attr('data-te-days'))
+            const weekday = $el.attr('data-te-weekday') ? true : false
+            $inputBox.val(format_rc_date(add_days(days, weekday), $inputBox.attr('fv')))
+        }
+
+        $.each(module["@TOMORROWBUTTON"], (_, name) => add_btn(name, "Tomorrow", 1))
+        $.each(module["@NEXTWORKDAYBUTTON"], (_, name) => add_btn(name, "Next Workday", 1, true))
+        $.each(module["@ADDDAYSBUTTON"], (name, btns) => {
+            $.each(btns, (_, info) => add_btn(name, info.text, info.days))
+        })
+        $("body").on("click", ".timeEnhancementsBtn", btn_event)
+    }
+
+    const modern_datetime = () => {
+        $(".ui-datepicker-trigger").off()
+        $(".hasDatepicker").each((_, el) => {
+            const fv = $(el).attr("fv")
+            const td = new TD.TempusDominus(el, {
+                display: {
+                    components: {
+                        calendar: true,
+                        date: true,
+                        month: true,
+                        year: true,
+                        decades: true,
+                        clock: true,
+                        hours: true,
+                        minutes: true,
+                        seconds: false,
+                        useTwentyfourHour: false
+                    },
+                },
+                localization: {
+                    format: "MM-dd-yyyy HH:mm",
+                    startOfTheWeek: 0,
+                }
+            })
+            console.log($(el).next())
+            $(el).next().on("click", () => td.show())
         })
     }
 
     $(document).ready(() => {
-        time_picker()
+        time_12_hour()
         actiontag_btn()
+        if (module.modern)
+            modern_datetime()
     })
 })()

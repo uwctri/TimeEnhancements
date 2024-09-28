@@ -27,8 +27,13 @@
     "project-settings": [
         {
             "key": "info",
-            "name": "No configuration is needed to enter 12 hour time. All below configuration options pertain to the modern date/time picker.",
+            "name": "No configuration is needed to enter 12 hour time. Just enter the time in 12 hour format and it will be convert to 24 hour format.",
             "type": "descriptive"
+        },
+        {
+            "key": "modern",
+            "name": "Use modern date/time picker",
+            "type": "checkbox"
         }
     ]
 }
