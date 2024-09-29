@@ -34,6 +34,21 @@
             "key": "modern",
             "name": "Use modern date/time picker",
             "type": "checkbox"
+        },
+        {
+            "key": "sow",
+            "name": "Start of Week",
+            "type": "radio",
+            "choices": [
+                {
+                    "value": "0",
+                    "name": "Sunday"
+                },
+                {
+                    "value": "1",
+                    "name": "Monday"
+                }
+            ]
         }
     ]
 }

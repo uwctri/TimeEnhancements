@@ -3,15 +3,9 @@
     const module = ExternalModules.UWMadison.TimeEnhancements
     const TD = tempusDominus
     // Supported field validation formats:
-    //date_dmy
-    //date_mdy
-    //date_ymd
-    //datetime_dmy
-    //datetime_mdy
-    //datetime_ymd
-    //datetime_seconds_dmy
-    //datetime_seconds_mdy
-    //datetime_seconds_ymd
+    //date_[dmy, mdy, ymd]
+    //datetime_[dmy, mdy, ymd]
+    //datetime_seconds_[dmy, mdy, ymd]
     //time_hh_mm_ss
     //time
 
@@ -159,12 +153,12 @@
                 localization: {
                     format: format.join(" "),
                     dayViewHeaderFormat: { month: 'long', year: 'numeric' },
-                    startOfTheWeek: 0, // User specifc TODO
-                    hourCycle: "h12" // User specifc TODOf
+                    startOfTheWeek: module.startWeekMonday ? "1" : "0",
+                    hourCycle: module.user12hour ? "h12" : "h23"
                 }
             })
-            //console.log($(el).next().get())
-            $(el).next().on("click", () => td.toggle())
+            console.log($(el).next().get())
+            //$(el).next().on("click", () => td.toggle())
         })
     }
 

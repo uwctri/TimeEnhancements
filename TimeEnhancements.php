@@ -29,9 +29,13 @@ class TimeEnhancements extends AbstractExternalModule
 
     private function loadEverything($instrument)
     {
+        if (!$this->isAuthenticated())
+            return;
         $this->actionTags($instrument);
         $this->passArgument([
             "modern" => $this->getProjectSetting("modern") == "1",
+            "user12hour" => $this->isUser12Hour(),
+            "startWeekMonday" => $this->getProjectSetting("sow") == "1"
         ]);
         $this->includeJs("tempus-dominus.min.js");
         $this->loadCss("tempus-dominus.min.css");
@@ -72,6 +76,14 @@ class TimeEnhancements extends AbstractExternalModule
             "@NEXTWORKDAYBUTTON" => $workday,
             "@ADDDAYSBUTTON" => $addDays,
         ]);
+    }
+
+    private function isUser12Hour()
+    {
+        $username = $this->getUser()->getUsername();
+        $result = $this->query("SELECT datetime_format FROM redcap_user_information WHERE username = ?", [$username]);
+        $row = $result->fetch_assoc();
+        return str_ends_with($row["datetime_format"], "12");
     }
 
     private function includeJs($path)
