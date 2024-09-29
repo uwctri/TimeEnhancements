@@ -2,14 +2,24 @@
 
     const module = ExternalModules.UWMadison.TimeEnhancements
     const TD = tempusDominus
+    // Supported field validation formats:
+    //date_dmy
+    //date_mdy
+    //date_ymd
+    //datetime_dmy
+    //datetime_mdy
+    //datetime_ymd
+    //datetime_seconds_dmy
+    //datetime_seconds_mdy
+    //datetime_seconds_ymd
+    //time_hh_mm_ss
+    //time
 
-    // TODO config for the picker (field config based - seconds, enable time, etc)
     // TODO Show cal on click of icons
 
     const time_12_hour = () => {
 
         const handle_time = (time, incSec) => {
-            console.log(time)
             time = time.toLowerCase()
             let isPM = time.includes('p')
             let isAM = time.includes('a')
@@ -69,7 +79,7 @@
         }
 
         // Match hh:mm:ss and hh:mm
-        $('input[fv^=time_hh_mm]').off().on('change', time_field_event)
+        $('input[fv=time_hh_mm_ss], input[fv=time]').off().on('change', time_field_event)
 
         // Match any datetime field
         $('input[fv^=datetime]').off().on('change', datetime_field_event)
@@ -122,28 +132,39 @@
         $(".ui-datepicker-trigger").off()
         $(".hasDatepicker").each((_, el) => {
             const fv = $(el).attr("fv")
+            const isDate = fv.includes("date")
+            const isTime = fv.includes("time")
+            const seconds = fv.includes("seconds") || fv.includes("ss")
+            let format = []
+            if (isDate)
+                format.push({ "dmy": "dd-MM-yyyy", "mdy": "MM-dd-yyyy", "ymd": "yyyy-MM-dd" }[fv.split("_").slice(-1)])
+            if (isTime && !seconds)
+                format.push("HH:mm")
+            if (isTime && seconds)
+                format.push("HH:mm:ss")
             const td = new TD.TempusDominus(el, {
                 display: {
                     components: {
-                        calendar: true,
-                        date: true,
-                        month: true,
-                        year: true,
-                        decades: true,
-                        clock: true,
-                        hours: true,
-                        minutes: true,
-                        seconds: false,
-                        useTwentyfourHour: false
+                        calendar: isDate,
+                        date: isDate,
+                        month: isDate,
+                        year: isDate,
+                        decades: isDate,
+                        clock: isTime,
+                        hours: isTime,
+                        minutes: isTime,
+                        seconds: seconds,
                     },
                 },
                 localization: {
-                    format: "MM-dd-yyyy HH:mm",
-                    startOfTheWeek: 0,
+                    format: format.join(" "),
+                    dayViewHeaderFormat: { month: 'long', year: 'numeric' },
+                    startOfTheWeek: 0, // User specifc TODO
+                    hourCycle: "h12" // User specifc TODOf
                 }
             })
-            console.log($(el).next())
-            $(el).next().on("click", () => td.show())
+            //console.log($(el).next().get())
+            $(el).next().on("click", () => td.toggle())
         })
     }
 

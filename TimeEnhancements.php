@@ -35,6 +35,7 @@ class TimeEnhancements extends AbstractExternalModule
         ]);
         $this->includeJs("tempus-dominus.min.js");
         $this->loadCss("tempus-dominus.min.css");
+        $this->loadCss("style.css");
         $this->includeJs("index.js");
     }
 
