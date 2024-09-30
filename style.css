@@ -2,3 +2,8 @@
     background: none;
     border: none;
 }
+
+.tempus-dominus-widget>.time-container>.time-container-clock>div {
+    font-weight: bold;
+    font-size: 1.2em;
+}

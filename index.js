@@ -9,8 +9,6 @@
     //time_hh_mm_ss
     //time
 
-    // TODO Show cal on click of icons
-
     const time_12_hour = () => {
 
         const handle_time = (time, incSec) => {
@@ -123,7 +121,6 @@
     }
 
     const modern_datetime = () => {
-        $(".ui-datepicker-trigger").off()
         $(".hasDatepicker").each((_, el) => {
             const fv = $(el).attr("fv")
             const isDate = fv.includes("date")
@@ -137,6 +134,7 @@
             if (isTime && seconds)
                 format.push("HH:mm:ss")
             const td = new TD.TempusDominus(el, {
+                useCurrent: false,
                 display: {
                     components: {
                         calendar: isDate,
@@ -157,8 +155,10 @@
                     hourCycle: module.user12hour ? "h12" : "h23"
                 }
             })
-            console.log($(el).next().get())
-            //$(el).next().on("click", () => td.toggle())
+            $(el).next().off().on("click", (event) => {
+                td.toggle()
+                event.stopPropagation()
+            })
         })
     }
 
