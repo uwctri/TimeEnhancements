@@ -24,17 +24,17 @@ class TimeEnhancements extends AbstractExternalModule
 
     public function redcap_survey_page($project_id, $record, $instrument)
     {
-        $this->loadEverything($instrument);
+        $this->loadEverything($instrument, true);
     }
 
-    private function loadEverything($instrument)
+    private function loadEverything($instrument, $isSurvey = false)
     {
         if (!$this->isAuthenticated())
             return;
         $this->actionTags($instrument);
         $this->passArgument([
             "modern" => $this->getProjectSetting("modern") == "1",
-            "user12hour" => $this->isUser12Hour(),
+            "user12hour" => $isSurvey ? true : $this->isUser12Hour(),
             "startWeekMonday" => $this->getProjectSetting("sow") == "1"
         ]);
         $this->includeJs("tempus-dominus.min.js");
