@@ -11,3 +11,8 @@ This External Module enables various enhancements to date and time entry in REDC
 ## Installing
 
 You can install the module from the REDCap EM repo or drop it directly in your modules folder (i.e. `redcap/modules/time_enhancements_v1.0.0`).
+
+
+## Dependencies
+
+* **Tempus Dominus** (`tempus-dominus.min.js`, `tempus-dominus.min.css`) - Auto-updating via GitHub Actions weekly workflow.
